@@ -1,4 +1,4 @@
-FBC.genres.sim <- function(dataset,testset,genreset) {
+  FBC.genres.sim <- function(dataset,testset,genreset) {
   dataset = as.matrix(dataset)
   testset = as.matrix(testset)
   genreset = as.matrix(genreset)
@@ -135,4 +135,32 @@ HM.test <- function(model,testset,vizinhos,name) {
   
   my.dataset <- data.frame(id = ids, rating = ratings) #Criação de um dataframe
   write.csv(my.dataset,name,row.names=F)  #Exportacion
+}
+
+HM.pretest <- function(model,testset)
+{
+  testset = as.matrix(testset[,2:4])
+  testUser = testset[,1] #Usuarios
+  testMovie = testset[,2] #Filmes
+  
+  tam = length(testUser)
+  ids = (1:(tam))
+  ids = ids-1
+  ratings = rep(0,tam) #vetor para os ratings
+  error = c()
+  
+  for(i in 1:30) # testando os k vizinhos
+  {
+    for(j in 1:tam)
+    {
+      ratings[j] = HM.predict(model,testUser[j],testMovie[j],i)  #predição
+    }
+    r = ratings;
+    print(paste("HM_",i,sep=""))
+    e = RMSE(r,testset[,3]) #calculo de Error
+    print(e)
+    error = c(error,e) # lista de errors
+  }
+  
+  return (error/sum(error)) # normalização
 }

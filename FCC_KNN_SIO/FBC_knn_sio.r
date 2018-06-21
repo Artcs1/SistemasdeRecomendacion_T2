@@ -106,3 +106,31 @@ FBC.sio.test <- function(model,testset,vizinhos,name) {
   my.dataset <- data.frame(id = ids, rating = ratings) #Criação de um dataframe
   write.csv(my.dataset,name,row.names=F)  #Exportacion
 }
+
+FBC.sio.pretest <- function(model,testset)
+{
+  testset = as.matrix(testset[,2:4])
+  testUser = testset[,1] #Usuarios
+  testMovie = testset[,2] #Filmes
+  
+  tam = length(testUser)
+  ids = (1:(tam))
+  ids = ids-1
+  ratings = rep(0,tam) #vetor para os ratings
+  error = c()
+  
+  for(i in 1:30) # testando os k vizinhos
+  {
+    for(j in 1:tam)
+    {
+      ratings[j] = FBC.sio.predict(model,testUser[j],testMovie[j],i)  #predição
+    }
+    r = ratings;
+    print(paste("FBC_knn_sio_",i,sep=""))
+    e = RMSE(r,testset[,3]) #calculo de Error
+    print(e)
+    error = c(error,e) # lista de errors
+  }
+  
+  return (error/sum(error)) # normalização
+}
