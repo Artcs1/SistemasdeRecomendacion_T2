@@ -12,7 +12,7 @@ MP.model <- function(dataset, testset, genreset) {
   nmovies <- max(c(dataset[, 2], testset[, 2], as.numeric(genreset[, 1]))) # nï¿½mero de filmes
   scores <- matrix(rep(0,nusers*nmovies), nusers, nmovies) # interacciï¿½n usuario filme
   
-  for (i in 1 : length(users)){
+  for (i in 1 : length(users)) {
     scores[users[i], movies[i]] <- ratings[i] #construï¿½ao da matriz de interaï¿½ï¿½o usuario filme
   }
   
@@ -20,11 +20,9 @@ MP.model <- function(dataset, testset, genreset) {
   genres = matrix(rep(0,nmovies*18),nmovies,length(listgener)) # generos
   
   #construção da matriz género vs filme
-  for(i in 1:nmovies)
-  {
+  for(i in 1:nmovies) {
     gener = strsplit(genreset[i,3],split = "|" , fixed = TRUE )[[1]]
-    for(j in 1:length(gener))
-    {
+    for(j in 1:length(gener)) {
       value = as.numeric(listgener[gener[j]])
       genres[i,value]=1;
     }
@@ -39,22 +37,25 @@ MP.predict <- function(model, user , movie) {
   genres <- as.matrix(model$genres)
   score <- as.matrix(model$score[user,])
   P.y = rep(0,5)
-  for(i in 1:length(score)){
+  for(i in 1:length(score)) {
     P.y[score[i]] = P.y[score[i]] + 1
   }
 
   P.xy = rep(1,5)
-  for(i in 1:5){ # evaluacion
+  for(i in 1:5) { # evaluacion
     if(P.y[i]>0) {
       for(j in 1:ncol(genres)) {#numero de generos
         a = 0
         for(k in 1:nrow(genres)) {#numero de movies
-          if(genres[movie,j]==genres[k,j] && score[k]==i){
+          if(genres[movie,j]==genres[k,j] && score[k]==i) {
             a = a + 1
           }
         }
         if(a!=0) {
           P.xy[i] = P.xy[i] * (a / P.y[i])
+        } else {
+          P.xy[i] = 0
+          break
         }
       }
     }
